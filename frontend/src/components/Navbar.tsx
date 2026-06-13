@@ -36,6 +36,7 @@ export default function Navbar() {
 
           <div className="hidden sm:flex items-center gap-5">
             <Link to="/" className={navLink('/')}>Search</Link>
+            {user?.isAdmin && <Link to="/admin" className={navLink('/admin')}>Admin</Link>}
             {user
               ? <button onClick={handleLogout} className={ctaClass}>
                   Logout ({user.name})
@@ -57,6 +58,9 @@ export default function Navbar() {
       {open && (
         <div className="sm:hidden border-t border-blue-800 bg-brand-primary px-4 pb-4 pt-2 flex flex-col gap-1">
           <Link to="/" className={mobileLink('/')} onClick={() => setOpen(false)}>Search</Link>
+          {user?.isAdmin && (
+            <Link to="/admin" className={mobileLink('/admin')} onClick={() => setOpen(false)}>Admin</Link>
+          )}
           <div className="pt-2">
             {user
               ? <button onClick={handleLogout} className={`${ctaClass} w-full`}>

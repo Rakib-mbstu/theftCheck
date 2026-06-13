@@ -1,12 +1,20 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import SearchPage from './pages/SearchPage'
 import LoginPage from './pages/LoginPage'
+import AdminPage from './pages/AdminPage'
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+function ProtectedRoute({ children, adminOnly = false }: { children: JSX.Element; adminOnly?: boolean }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" />
+  if (adminOnly && !user.isAdmin) return <Navigate to="/" />
+  return children
+}
 
 export default function App() {
   return (
@@ -19,6 +27,9 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<SearchPage />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/admin" element={
+                  <ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>
+                } />
               </Routes>
             </main>
             <Footer />
