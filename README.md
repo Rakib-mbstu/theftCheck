@@ -87,13 +87,48 @@ npm run dev:frontend
 
 The frontend runs at `http://localhost:5174` and proxies all `/api` requests to the backend at `http://localhost:3000`.
 
+## Pages
+
+| Route             | Auth         | Description                                      |
+|-------------------|--------------|--------------------------------------------------|
+| `/`               | Public       | Search any phone by IMEI                         |
+| `/login`          | Public       | Sign in with Google                              |
+| `/complaints`     | Required     | View your own filed complaints                   |
+| `/complaints/new` | Required     | File a new stolen phone complaint                |
+| `/admin`          | Admin only   | Dashboard — review complaints, manage users      |
+
 ## API Reference
 
-| Method | Endpoint            | Auth     | Description                        |
-|--------|---------------------|----------|------------------------------------|
-| POST   | `/api/auth/google`  | None     | Exchange Google ID token for JWT   |
-| POST   | `/api/auth/logout`  | Required | Revoke the current JWT             |
-| GET    | `/api/search?imei=` | None     | Look up a device by IMEI number    |
+### Auth
+
+| Method | Endpoint           | Auth       | Description                      |
+|--------|--------------------|------------|----------------------------------|
+| POST   | `/api/auth/google` | None       | Exchange Google ID token for JWT |
+| POST   | `/api/auth/logout` | Required   | Revoke the current JWT           |
+
+### Search
+
+| Method | Endpoint            | Auth | Description                   |
+|--------|---------------------|------|-------------------------------|
+| GET    | `/api/search?imei=` | None | Look up a device by IMEI      |
+
+### Complaints
+
+| Method | Endpoint               | Auth     | Description                          |
+|--------|------------------------|----------|--------------------------------------|
+| POST   | `/api/complaints`      | Required | File a new stolen phone complaint    |
+| GET    | `/api/complaints/mine` | Required | Get your own complaints              |
+
+### Admin
+
+| Method | Endpoint                            | Admin only | Description              |
+|--------|-------------------------------------|------------|--------------------------|
+| GET    | `/api/admin/complaints`             | Yes        | All complaints           |
+| PATCH  | `/api/admin/complaints/:id/approve` | Yes        | Approve a complaint      |
+| PATCH  | `/api/admin/complaints/:id/reject`  | Yes        | Reject a complaint       |
+| PATCH  | `/api/admin/complaints/:id/resolve` | Yes        | Mark complaint resolved  |
+| GET    | `/api/admin/users`                  | Yes        | All users                |
+| PATCH  | `/api/admin/users/:id/make-admin`   | Yes        | Grant or revoke admin    |
 
 ### POST `/api/auth/google`
 
@@ -132,6 +167,20 @@ The frontend runs at `http://localhost:5174` and proxies all `/api` requests to 
 ```
 
 **Response (not found):** `404 { "error": "No device found with that IMEI" }`
+
+### POST `/api/complaints`
+
+**Request:**
+```json
+{
+  "imei": "356938035643809",
+  "brand": "Apple",
+  "model": "iPhone 14",
+  "locationStolen": "Dhaka, Bangladesh"
+}
+```
+
+**Response:** `201` with complaint object. `409` if you already have an open complaint for the same device.
 
 ## Database Schema
 
