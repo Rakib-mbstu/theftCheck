@@ -22,7 +22,7 @@ theftcheck/
 ## Prerequisites
 
 - Node.js 18+
-- PostgreSQL (local or Docker)
+- Docker (for PostgreSQL)
 - A Google Cloud project with OAuth 2.0 credentials
 
 ## Setup
@@ -66,14 +66,37 @@ Edit `frontend/.env`:
 VITE_GOOGLE_CLIENT_ID="your_google_client_id.apps.googleusercontent.com"
 ```
 
-### 4. Run database migrations
+### 4. Start the database
+
+```bash
+docker run -d \
+  --name theftcheck-db \
+  -e POSTGRES_DB=theftcheck \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16
+```
+
+Use this as your `DATABASE_URL` in `backend/.env`:
+```
+postgresql://postgres:postgres@localhost:5432/theftcheck
+```
+
+To stop/start the container later:
+```bash
+docker stop theftcheck-db
+docker start theftcheck-db
+```
+
+### 5. Run database migrations
 
 ```bash
 cd backend
 npx prisma migrate dev --name init
 ```
 
-### 5. Start development servers
+### 6. Start development servers
 
 In two separate terminals:
 
